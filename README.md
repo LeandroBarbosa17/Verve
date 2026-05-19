@@ -101,123 +101,152 @@ Partial UTF-8 support:
 
 # Compilation
 
-Using Make:
+## Using Make
 
 ```bash
 make
+```
 
-Manual compilation:
+## Manual Compilation
 
+```bash
 gcc -Wall -Wextra -pedantic -std=c99 \
 main.c editor.c buffer.c terminal.c \
 -o verve
-Running
+```
 
-Open the editor:
+---
 
+# Running
+
+## Open the editor
+
+```bash
 ./verve
+```
 
-Open a file:
+## Open a file
 
+```bash
 ./verve file.txt
-Keyboard Shortcuts
-Key	Action
-Ctrl+S	Save file
-Ctrl+Q	Quit editor
-Ctrl+F	Search
-Ctrl+Z	Undo
-Ctrl+Y	Redo
-Ctrl+B	Start selection
-Ctrl+C	Copy selection
-Ctrl+X	Cut selection
-Ctrl+V	Paste
-Enter	New line
-Tab	Indentation
-Esc	Cancel selection
-Project Structure
-File	Responsibility
-main.c	Program initialization
-editor.c	Main editor logic
-buffer.c	Text buffer manipulation
-terminal.c	Raw terminal mode and input
-editor.h	Global structures and declarations
-buffer.h	Buffer structures and declarations
-Internal Architecture
+```
+
+---
+
+# Keyboard Shortcuts
+
+| Key | Action |
+|---|---|
+| Ctrl+S | Save file |
+| Ctrl+Q | Quit editor |
+| Ctrl+F | Search |
+| Ctrl+Z | Undo |
+| Ctrl+Y | Redo |
+| Ctrl+B | Start selection |
+| Ctrl+C | Copy selection |
+| Ctrl+X | Cut selection |
+| Ctrl+V | Paste |
+| Enter | New line |
+| Tab | Indentation |
+| Esc | Cancel selection |
+
+---
+
+# Project Structure
+
+| File | Responsibility |
+|---|---|
+| `main.c` | Program initialization |
+| `editor.c` | Main editor logic |
+| `buffer.c` | Text buffer manipulation |
+| `terminal.c` | Raw terminal mode and input |
+| `editor.h` | Global structures and declarations |
+| `buffer.h` | Buffer structures and declarations |
+
+---
+
+# Internal Architecture
 
 Verve currently uses:
-
-line-based text buffers
-dynamic memory allocation
-incremental rendering
-basic syntax parsing
-reversible action history
+- line-based text buffers
+- dynamic memory allocation
+- incremental rendering
+- basic syntax parsing
+- reversible action history
 
 Each text row stores:
+- original content
+- rendered content
+- syntax highlight metadata
 
-original content
-rendered content
-syntax highlight metadata
-Memory Management
+---
+
+# Memory Management
 
 The editor heavily relies on:
-
-malloc
-realloc
-free
-dynamic buffer resizing
+- `malloc`
+- `realloc`
+- `free`
+- dynamic buffer resizing
 
 This project was specifically designed to explore efficient memory usage in C.
 
-Current Limitations
+---
+
+# Current Limitations
 
 Verve is already functional, but still has several limitations:
+- incomplete UTF-8 support
+- simplified undo/redo system
+- no mouse support
+- no multiple buffers/tabs
+- no autosave or crash recovery
+- no gap buffer or piece table
+- performance limitations with huge files
+- no plugin/configuration system
 
-Incomplete UTF-8 support
-Simplified undo/redo system
-No mouse support
-No multiple buffers/tabs
-No autosave or crash recovery
-No gap buffer or piece table
-Performance limitations with huge files
-No plugin/configuration system
-Project Goals
+---
+
+# Project Goals
 
 This project was built primarily as a learning experience for:
-
-low-level C programming
-terminal applications
-text editor internals
-dynamic memory management
-ANSI escape sequences
-editor rendering pipelines
+- low-level C programming
+- terminal applications
+- text editor internals
+- dynamic memory management
+- ANSI escape sequences
+- editor rendering pipelines
 
 Verve is not intended to replace mature editors such as:
-
-Vim
-Neovim
-Helix
-Emacs
-Nano
+- Vim
+- Neovim
+- Helix
+- Emacs
+- Nano
 
 However, it already works as a real and usable terminal editor for small and medium-sized tasks.
 
-Future Improvements
+---
+
+# Future Improvements
 
 Planned or possible future features:
+- complete UTF-8 support
+- mouse support
+- multiple buffers/tabs
+- themes
+- configuration files
+- advanced syntax highlighting
+- robust undo/redo
+- autosave and recovery
+- gap buffer implementation
+- piece table implementation
+- basic LSP integration
+- split windows
+- plugin system
 
-Complete UTF-8 support
-Mouse support
-Multiple buffers/tabs
-Themes
-Configuration files
-Advanced syntax highlighting
-Robust undo/redo
-Autosave and recovery
-Gap Buffer implementation
-Piece Table implementation
-Basic LSP integration
-Split windows
-Plugin system
-License
+---
+
+# License
 
 MIT
