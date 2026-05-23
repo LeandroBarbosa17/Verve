@@ -14,6 +14,7 @@
 #include "terminal.h"
 #include "append_buffer.h"
 #include "buffer.h"
+#include "utf8.h"
 
 #define CTRL_KEY(k) ((k) & 0x1f)
 
@@ -341,28 +342,16 @@ void editorClearRedo() {
     E.redo_len = 0;
 }
 
-void editorInsertChar(int c) {
-
-    EditorAction action = {
-      ACTION_INSERT,
-      E.cx,
-      E.cy,
-      malloc(2)
-    };
-
-    action.data[0] = c;
-    action.data[1] = '\0';
-
-    editorPushUndo(action);
-
-    editorClearRedo();
-
+void editorInsertChar(int c)
+{
     if (E.cy == E.numrows)
         editorInsertRow(E.numrows, "", 0);
 
-    editorRowInsertChar(&E.row[E.cy],
-                        E.cx,
-                        c);
+    editorRowInsertChar(
+        &E.row[E.cy],
+        E.cx,
+        c
+    );
 
     E.cx++;
 
@@ -535,10 +524,25 @@ void editorDelChar() {
 
         editorClearRedo();
 
-        editorRowDelChar(row,
-                         E.cx - 1);
+        int prev =
+            utf8PrevChar(
+                row->chars,
+                E.cx
+            );
 
-        E.cx--;
+        int bytes = E.cx - prev;
+
+        memmove(
+            &row->chars[prev],
+            &row->chars[E.cx],
+            row->size - E.cx + 1
+        );
+
+        row->size -= bytes;
+
+        editorUpdateRow(row);
+
+        E.cx = prev;       
 
     } else {
 

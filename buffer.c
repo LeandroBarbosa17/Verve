@@ -10,6 +10,7 @@
 
 #include "editor.h"
 #include "buffer.h"
+#include "utf8.h"
 
 char *C_HL_keywords[] = {
     "switch",
@@ -214,41 +215,6 @@ int utf8CharSize(unsigned char c) {
     return 1;
 }
 
-int utf8PrevChar(char *s,
-                 int index) {
-
-    if (index <= 0)
-        return 0;
-
-    index--;
-
-    while (index > 0 &&
-          ((s[index] & 0xC0) == 0x80)) {
-
-        index--;
-    }
-
-    return index;
-}
-
-int utf8NextChar(char *s,
-                 int len,
-                 int index) {
-
-    if (index >= len)
-        return len;
-
-    index++;
-
-    while (index < len &&
-          ((s[index] & 0xC0) == 0x80)) {
-
-        index++;
-    }
-
-    return index;
-}
-
 void editorInsertRow(int at,
                      char *s,
                      size_t len) {
@@ -347,6 +313,39 @@ void editorRowInsertChar(EditorRow *row,
     row->size++;
 
     row->chars[at] = c;
+
+    editorUpdateRow(row);
+}
+
+void editorRowInsertBytes(
+    EditorRow *row,
+    int at,
+    const char *s,
+    int len
+) {
+
+    if (at < 0 || at > row->size)
+        at = row->size;
+
+    row->chars =
+        realloc(
+            row->chars,
+            row->size + len + 1
+        );
+
+    memmove(
+        &row->chars[at + len],
+        &row->chars[at],
+        row->size - at + 1
+    );
+
+    memcpy(
+        &row->chars[at],
+        s,
+        len
+    );
+
+    row->size += len;
 
     editorUpdateRow(row);
 }

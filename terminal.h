@@ -8,4 +8,6 @@ int editorReadKey();
 
 int getWindowSize(int *rows, int *cols);
 
+int editorReadUtf8Char(char *buf);
+
 #endif

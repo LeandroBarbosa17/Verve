@@ -35,6 +35,12 @@ void editorRowInsertChar(EditorRow *row,
 void editorRowDelChar(EditorRow *row,
                       int at);
 
+void editorRowInsertBytes(
+    EditorRow *row,
+    int at,
+    const char *s,
+    int len);
+
 char *editorRowsToString(int *buflen);
 
 void editorUpdateRow(EditorRow *row);
@@ -51,8 +57,8 @@ void editorRowAppendString(EditorRow *row,
 
 int utf8CharSize(unsigned char c);
 
-int utf8PrevChar(char *s, int index);
+int utf8PrevChar(const char *s, int index);
 
-int utf8NextChar(char *s, int len, int index);
+int utf8NextChar(const char *s, int len, int index);
 
 #endif

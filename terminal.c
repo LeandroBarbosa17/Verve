@@ -5,6 +5,7 @@
 #include <sys/ioctl.h>
 
 #include "terminal.h"
+#include "utf8.h"
 
 static struct termios original_termios;
 
@@ -141,6 +142,36 @@ int editorReadKey() {
     }
 
     return c;
+}
+
+int editorReadUtf8Char(char *buf)
+{
+    char c;
+
+    if (read(STDIN_FILENO, &c, 1) != 1)
+        return 0;
+
+    buf[0] = c;
+
+    int len =
+        utf8CharLen(
+            (unsigned char)c
+        );
+
+    for (int i = 1; i < len; i++) {
+
+        if (
+            read(
+                STDIN_FILENO,
+                &buf[i],
+                1
+            ) != 1
+        ) {
+            return 0;
+        }
+    }
+
+    return len;
 }
 
 int getWindowSize(int *rows, int *cols) {
