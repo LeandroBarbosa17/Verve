@@ -40,9 +40,29 @@ enum EditorActionType {
     ACTION_DEL_NEWLINE
 };
 
+int editorRowCxtoRx(EditorRow *row, int cx) {
+
+    int rx = 0;
+    int i = 0;
+
+    while (i < cx) {
+
+        if ((row->chars[i] & 0xC0) != 0x80)
+            rx++;
+
+        i++;
+    }
+
+    return rx;
+    
+}
+
 void editorScroll() {
 
-    E.rx = E.cx;
+    if (E.cy < E.numrows)
+        E.rx = editorRowCxtoRx(&E.row[E.cy], E.cx);
+    else
+        E.rx = 0;
 
     if (E.cy < E.rowoff)
         E.rowoff = E.cy;
@@ -191,46 +211,49 @@ void editorDrawRows(AppendBuffer *ab) {
 
             int current_color = -1;
 
-            for (int j = 0; j < len; j++) {
+            int j = 0;
 
-                int selected =
-                    editorInSelection(
-                        j + E.coloff,
-                        filerow);
+            while (j < len) {
+
+                unsigned char ch = c[j];
+
+                int char_len = 1;
+
+                if ((ch & 0x80) == 0x00)
+                    char_len = 1;
+                else if ((ch & 0xE0) == 0xC0)
+                    char_len = 2;
+                else if ((ch & 0xF0) == 0xE0)
+                    char_len = 3;
+                else if ((ch & 0xF8) == 0xF0)
+                    char_len = 4;
+
+                int selected = editorInSelection(j + E.coloff, filerow);
 
                 if (selected) {
 
-                    abAppend(ab,
-                             "\x1b[7m",
-                             4);
-
+                    abAppend(ab, "\x1b[7m", 4);
+                    
                 } else {
 
-                    abAppend(ab,
-                             "\x1b[m",
-                             3);
+                    abAppend(ab, "\x1b[m", 3);
+                    
                 }
-            
+
                 if (hl[j] == HL_NORMAL) {
 
                     if (current_color != -1) {
 
-                        abAppend(ab,
-                                 "\x1b[39m",
-                                 5);
+                        abAppend(ab, "\x1b[39m", 5);
 
                         current_color = -1;
                     }
 
-                    abAppend(ab,
-                             &c[j],
-                             1);
-
+                    abAppend(ab, &c[j], char_len);
+                    
                 } else {
 
-                    int color =
-                        editorSyntaxToColor(
-                            hl[j]);
+                    int color = editorSyntaxToColor(hl[j]);
 
                     if (color != current_color) {
 
@@ -238,21 +261,15 @@ void editorDrawRows(AppendBuffer *ab) {
 
                         char buf[16];
 
-                        int clen =
-                            snprintf(buf,
-                                     sizeof(buf),
-                                     "\x1b[%dm",
-                                     color);
+                        int clen = snprintf(buf, sizeof(buf), "\x1b[%dm", color);
 
-                        abAppend(ab,
-                                 buf,
-                                 clen);
+                        abAppend(ab, buf, clen);
                     }
 
-                    abAppend(ab,
-                             &c[j],
-                             1);
+                    abAppend(ab, &c[j], char_len);
                 }
+
+                j += char_len;
             }
 
             abAppend(ab,
@@ -265,6 +282,7 @@ void editorDrawRows(AppendBuffer *ab) {
         abAppend(ab, "\r\n", 2);
     }
 }
+
 void editorRefreshScreen() {
 
     editorScroll();
