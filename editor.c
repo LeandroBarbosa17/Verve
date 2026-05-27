@@ -182,9 +182,19 @@ int editorInSelection(int x, int y) {
 
 void editorDrawRows(AppendBuffer *ab) {
 
+    int line_number_width = 6;
+
     for (int y = 0; y < E.screenrows; y++) {
 
         int filerow = y + E.rowoff;
+
+        char ln[32];
+
+        snprintf(ln, sizeof(ln), "%4d |", filerow + 1);
+
+        abAppend(ab, "\x1b[90m", 5);
+        abAppend(ab, ln, strlen(ln));
+        abAppend(ab, "\x1b[39m", 5);
 
         if (filerow >= E.numrows) {
 
@@ -198,8 +208,8 @@ void editorDrawRows(AppendBuffer *ab) {
             if (len < 0)
                 len = 0;
 
-            if (len > E.screencols)
-                len = E.screencols;
+            if (len > E.screencols - line_number_width)
+                len = E.screencols - line_number_width;
 
             char *c =
                 &E.row[filerow]
@@ -305,7 +315,7 @@ void editorRefreshScreen() {
              sizeof(buf),
              "\x1b[%d;%dH",
              (E.cy - E.rowoff) + 1,
-             (E.rx - E.coloff) + 1);
+             (E.rx - E.coloff) + 7);
 
     abAppend(&ab, buf, strlen(buf));
 
